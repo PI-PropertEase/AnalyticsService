@@ -23,13 +23,14 @@ dfraw.drop (dfraw.iloc [:, 2 : 4], axis = 1, inplace = True) # just lat long
 dfraw['bathrooms'] = dfraw['bathrooms_text'].str.extract("(\d*\.?\d+)", expand=False)
 dfraw['bathrooms'] = np.where(dfraw['bathrooms_text'].str.contains("half", case=False, na=False), 0.5, dfraw['bathrooms'])
 dfraw = dfraw.dropna() # drop NaN values
-df = dfraw.drop ("bathrooms_text", axis = 1)
+dfraw["number_of_guests"] = dfraw["accommodates"]
+df = dfraw.drop(["accommodates", "bathrooms_text"], axis=1)
 
 df ["price"] = df ["price"].str.replace ("$", "", regex = False)
 df ["price"] = df ["price"].str.replace (",", "", regex = False)
 df ["price"] = df ["price"].astype (np.float32, copy = False)
 df ["price"] = df ["price"].astype (np.int32, copy = False)
-df ["accommodates"] = df ["accommodates"].astype (np.int32, copy = False)
+df ["number_of_guests"] = df ["number_of_guests"].astype (np.int32, copy = False)
 df ["bedrooms"] = df ["bedrooms"].astype (np.int32, copy = False)
 df ["beds"] = df ["beds"].astype (np.int32, copy = False)
 df ["bathrooms"] = df ["bathrooms"].astype (np.float32, copy = False)
@@ -51,8 +52,8 @@ def remove (ds, col):
 
 df, removed = remove (df, "price")
 
-df ["qty"] = df ["amenities"].str.split (",").apply (len)
-df ["qty"] = df ["qty"].astype (np.int32, copy = False)
+df ["num_amenities"] = df ["amenities"].str.split (",").apply (len)
+df ["num_amenities"] = df ["num_amenities"].astype (np.int32, copy = False)
 dfenc = df.drop ("amenities", axis = 1)
 
 def evaluate (ytest, prediction):
@@ -66,7 +67,9 @@ x = dfenc.drop ("price", axis = 1)
 xtrain, xtest, ytrain, ytest = train_test_split (x, y)
 
 model = RandomForestRegressor()
+print("Training model...")
 model.fit (xtrain, ytrain)
+print("Model training done!")
 
 if __name__ == "__main__":
     prediction = model.predict (xtest)

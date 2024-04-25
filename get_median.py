@@ -1,7 +1,5 @@
-import schedule
-import time
-import json
 import statistics
+import pandas as pd
 from ProjectUtils.MessagingService.queue_definitions import (
     channel, 
     EXCHANGE_NAME, 
@@ -9,46 +7,51 @@ from ProjectUtils.MessagingService.queue_definitions import (
     property_to_analytics
 )
 from ProjectUtils.MessagingService.schemas import (
-    MessageFactory,
-    to_json
+    MessageType,
+    from_json,
+    to_json,
+    MessageFactory
 )
 from model import model, evaluate
 
 
-def request_properties():
-    message = MessageFactory.create_get_all_properties_message()
-    channel.basic_publish(
-        exchange=EXCHANGE_NAME,
-        routing_key=ANALYTICS_TO_PROPERTY_QUEUE_ROUTING_KEY,
-        body=to_json(message)
-    )
-
-
 def get_median(properties_list):
-    prices = [property["price"] for property in properties_list]
-    prediction = model.predict(prices)
-    print(evaluate(prices, prediction))
-    median = statistics.median(prediction)
+    x = pd.DataFrame(properties_list)
+    predictions_list = []
+    for _, property in x.iterrows():
+        property_df = pd.DataFrame([property])
+        prediction = model.predict(property_df)
+        predictions_list.append(prediction[0])
+    print(predictions_list)
+    median = statistics.median(predictions_list)
     return median
 
 
-def receive_properties(retry):
-    method_frame, _, body = channel.basic_get(queue=property_to_analytics, auto_ack=True)
-    if method_frame:
-        properties_list = json.loads(body)
-        get_median(properties_list)
-    elif retry > 0:
-        print("No properties received. Retrying...")
-        time.sleep(1) 
-        receive_properties()
-        retry -= 1
-    else:
-        print("No properties received")
+def receive_properties(channel, method, properties, body):
+    delivery_tag = method.delivery_tag
+
+    message = from_json(body)
+    print("Received message:\n" + str(message.__dict__))
+
+    properties_list = message.body
+    median = get_median(properties_list)
+    response_message  = MessageFactory.create_recommended_price_response_message({"median": median})
+    channel.basic_publish(
+        exchange=EXCHANGE_NAME,
+        routing_key=ANALYTICS_TO_PROPERTY_QUEUE_ROUTING_KEY,
+        body=to_json(response_message)
+    )
+
+    channel.basic_ack(delivery_tag)
 
 
-schedule.every().day.at("00:00").do(request_properties)
-schedule.every().day.at("00:01").do(receive_properties, retry=3)
+def run():
+    channel.basic_consume(queue=property_to_analytics.method.queue, on_message_callback=receive_properties)
+    try:
+        channel.start_consuming()
+    except KeyboardInterrupt:
+        channel.stop_consuming()
 
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+
+if __name__ == "__main__":
+    run()
