@@ -1,5 +1,6 @@
 import statistics
 import pandas as pd
+from joblib import load
 from ProjectUtils.MessagingService.queue_definitions import (
     channel, 
     EXCHANGE_NAME, 
@@ -7,15 +8,14 @@ from ProjectUtils.MessagingService.queue_definitions import (
     property_to_analytics
 )
 from ProjectUtils.MessagingService.schemas import (
-    MessageType,
     from_json,
     to_json,
     MessageFactory
 )
-from model import model, evaluate
 
 
 def get_median(properties_list):
+    model = load("model.joblib")
     x = pd.DataFrame(properties_list)
     predictions_list = []
     for _, property in x.iterrows():

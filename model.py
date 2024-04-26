@@ -4,6 +4,7 @@ import pathlib as pl
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from sklearn.ensemble import RandomForestRegressor
+from joblib import dump
 
 path = pl.Path (f"archive")
 df_list = [] 
@@ -70,6 +71,7 @@ model = RandomForestRegressor()
 print("Training model...")
 model.fit (xtrain, ytrain)
 print("Model training done!")
+dump(model, "model.joblib")
 
 if __name__ == "__main__":
     prediction = model.predict (xtest)

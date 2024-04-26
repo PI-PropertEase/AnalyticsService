@@ -116,8 +116,6 @@ def request_recommended_price():
             print("Received message:\n" + str(message.__dict__))
             print("Median price: " + str(message.body["median"]))
             break
-        else:
-            print("Waiting for response...")
     
 request_recommended_price()    
 """
