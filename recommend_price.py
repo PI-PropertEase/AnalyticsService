@@ -14,6 +14,12 @@ from ProjectUtils.MessagingService.schemas import (
 )
 
 
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.addHandler(logging.StreamHandler())
+
 features_comparison = {
     "bathrooms": 0.03,
     "bedrooms": 0.05,
@@ -74,10 +80,11 @@ def receive_properties(channel, method, properties, body):
 
     message = from_json(body)
     print("Received message:\n" + str(message.__dict__))
+    logger.info("Received message:\n" + str(message.__dict__))
 
     properties_list = message.body
     recommended_prices = calcualte_recommended_price(properties_list)
-    response_message  = MessageFactory.create_recommended_price_response_message(recommended_prices)
+    response_message = MessageFactory.create_recommended_price_response_message(recommended_prices)
     channel.basic_publish(
         exchange=EXCHANGE_NAME,
         routing_key=ANALYTICS_TO_PROPERTY_QUEUE_ROUTING_KEY,
@@ -88,6 +95,7 @@ def receive_properties(channel, method, properties, body):
 
 
 def run():
+    logger.info("Starting recommend_price service")
     channel.basic_consume(queue=property_to_analytics.method.queue, on_message_callback=receive_properties)
     try:
         channel.start_consuming()
