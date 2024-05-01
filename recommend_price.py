@@ -62,13 +62,8 @@ def calcualte_recommended_price(properties_list):
         predictions_dict[property["id"]] = prediction[0]
         properties_dict[property["id"]] = property
 
-    sorted_predictions = sorted(predictions_dict.items(), key=lambda item: item[1]) # list of tuples (id, price predicted)
-    number_of_properties = len(sorted_predictions)
-
-    if number_of_properties % 2 == 1:
-        median_id = sorted_predictions[(number_of_properties // 2) + 1][0]
-    else:
-        median_id  = sorted_predictions[number_of_properties // 2][0]
+    median_price = statistics.median_high(predictions_dict.values())
+    median_id = next(key for key, value in predictions_dict.items() if value == median_price)
 
     recommended_prices = calclate_difference(predictions_dict, properties_dict, median_id)
     
@@ -79,7 +74,6 @@ def receive_properties(channel, method, properties, body):
     delivery_tag = method.delivery_tag
 
     message = from_json(body)
-    print("Received message:\n" + str(message.__dict__))
     logger.info("Received message:\n" + str(message.__dict__))
 
     properties_list = message.body

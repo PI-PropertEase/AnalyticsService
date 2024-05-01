@@ -18,8 +18,6 @@ dfraw.drop (dfraw.iloc [:, 0 : 29], axis = 1, inplace = True) # until latitude
 
 dfraw.drop (dfraw.iloc [:, 11 :], axis = 1, inplace = True)
 dfraw.drop (dfraw.iloc [:, 2 : 4], axis = 1, inplace = True) # just lat long
-#dfraw.drop (dfraw.iloc [:, 0 : 3], axis = 1, inplace = True)  # just room_type
-#dfraw.drop (dfraw.iloc [:, 0 : 4], axis = 1, inplace = True)  # no room_type and no latlong
 
 dfraw['bathrooms'] = dfraw['bathrooms_text'].str.extract("(\d*\.?\d+)", expand=False)
 dfraw['bathrooms'] = np.where(dfraw['bathrooms_text'].str.contains("half", case=False, na=False), 0.5, dfraw['bathrooms'])
