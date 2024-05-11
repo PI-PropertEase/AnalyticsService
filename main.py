@@ -5,13 +5,17 @@ from ProjectUtils.MessagingService.queue_definitions import (
     channel, 
     EXCHANGE_NAME, 
     ANALYTICS_TO_PROPERTY_QUEUE_ROUTING_KEY,
-    property_to_analytics
+    property_to_analytics,
+    property_to_analytics_data
 )
 from ProjectUtils.MessagingService.schemas import (
     from_json,
     to_json,
     MessageFactory
 )
+
+import requests
+import json
 
 
 import logging
@@ -87,15 +91,36 @@ def receive_properties(channel, method, properties, body):
 
     channel.basic_ack(delivery_tag)
 
+def send_data_to_elasticsearch(channel, method, properties, body):
+        
+    delivery_tag = method.delivery_tag
+
+    message = from_json(body)
+
+    properties = message.body
+
+    logger.info("Sending data to Elasticsearch")
+    for p in properties:
+        url = "http://elasticsearch:9200/property/_doc/" + p["id"]
+        data = json.dumps(p)
+        response = requests.post(url, data=data, headers={'Content-Type': 'application/json'})
+        if response.status_code >= 300 or response.status_code < 200:
+            logger.error(f"Error sending data to Elasticsearch: {response.status_code} - {response.text}")
+            
+
+    channel.basic_ack(delivery_tag)
 
 def run():
-    logger.info("Starting recommend_price service")
+    logger.info("Starting analytics service")
     channel.basic_consume(queue=property_to_analytics.method.queue, on_message_callback=receive_properties)
+    channel.basic_consume(queue=property_to_analytics_data.method.queue, on_message_callback=send_data_to_elasticsearch)
     try:
         channel.start_consuming()
     except KeyboardInterrupt:
         channel.stop_consuming()
 
 
+
 if __name__ == "__main__":
     run()
+
