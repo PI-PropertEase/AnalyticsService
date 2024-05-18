@@ -22,10 +22,10 @@ def is_bad_trend(location):
 
     print(df)
 
-    strings_to_check = ['disaster', 'tragedy', 'flood', 'murder', 'death', 'dead', 'donation',
-                        'fire', 'storm', 'hurricane', 'cyclone', 'tornado', 'earthquake',
-                        'shooting', 'terrorism', 'bomb', 'killed', 'kidnapping', 'genocide', 'war']
-
+    strings_to_check = ['disaster', 'tragedy', 'flood', 'murder', 'death', 'dead', 'violence', 'invasion'
+                    r'fire(?!works)', 'storm', 'hurricane', 'cyclone', 'tornado', 'earthquake', 'conflict'
+                    'shooting', 'terrorism', 'bomb', 'kill', 'kidnapping', 'genocide', 'war']
+    
     if df['topics'].str.contains('|'.join(strings_to_check), case=False).any():
         return True
     else:
