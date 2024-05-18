@@ -1,20 +1,65 @@
 import pandas as pd
 import time                        
-from pytrends.request import TrendReq
-pytrend = TrendReq()
+import serpapi
+import math
 
-#pytrend.build_payload(kw_list=['Fátima'], timeframe='2019-05-05 2024-05-13')
-#pytrend.interest_over_time()
+API_KEY = "b0d7dc66d35955a0b73cbd71e9cb0441851d216c3c2fb4c5af3a31a8000ce9f1"
 
-df = pd.read_csv('fatimaTrends.csv')
+search = serpapi.search({
+  "engine": "google_trends",
+  "q": "Fátima",
+  "data_type": "TIMESERIES",
+  "api_key": API_KEY,
+  "date": "today 1-m"
+})
 
-df = df.set_index(df['Semana'])
-df = df.drop(['Semana'], axis=1)
+results = search.as_dict()
+interest_over_time = results["interest_over_time"]["timeline_data"]
+data = [{'value': value_entry['extracted_value']} for entry in interest_over_time for value_entry in entry['values']]
 
-pct_changes = df.pct_change()
+# Create the DataFrame
+df = pd.DataFrame(data)
 
-peak_dates = pct_changes[pct_changes["Fátima"] > 0.8]
-#print(peak_dates)
+print(df)
+
+""" search = serpapi.search({
+  "engine": "google_trends",
+  "q": "Rio Grande do Sul",
+  "data_type": "RELATED_TOPICS",
+  "api_key": API_KEY,
+  "date": "now 1-d"
+})
+
+results = search.as_dict()
+
+rising_topics = [f"{topic['topic']['title']} {topic['topic']['type']}" for topic in results["related_topics"]["rising"]]
+top_topics = [f"{topic['topic']['title']} {topic['topic']['type']}" for topic in results["related_topics"]["top"]]
+
+# Combining rising and top related topics into a single list
+topics = rising_topics + top_topics
+
+# Creating the DataFrame with a single column
+df = pd.DataFrame(topics, columns=['topics'])
+
+# Display the DataFrame
+print(df)
+
+strings_to_check = ['disaster', 'tragedy', 'flood', 'murder', 'death', 'dead', 'donation',
+                    'fire', 'storm', 'hurricane', 'cyclone', 'tornado', 'earthquake',
+                    'shooting', 'terrorism', 'bomb', 'killed', 'kidnapping', 'genocide', 'war']
+
+if df['topics'].str.contains('|'.join(strings_to_check), case=False).any():
+    print("Bad indicator")
+else:
+    print("Good indicator") """
+
+""" pytrend = TrendReq(tz=330)
+
+pytrend.build_payload(kw_list=['Fátima'], timeframe='today 1-m')
+df = pytrend.interest_over_time()
+print(df)
+
+
 
 
 print("Waiting for that bitch named GOOGLE..")
@@ -40,3 +85,4 @@ else:
     print("Good indicator")
 
 
+ """
