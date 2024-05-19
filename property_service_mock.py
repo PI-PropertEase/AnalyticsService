@@ -287,4 +287,4 @@ message = MessageFactory.create_get_recommended_price(json_properties)
 request_recommended_price(message)
 json_properties2 = [property.model_dump() for property in properties2]
 message2 = MessageFactory.create_get_recommended_price(json_properties2) 
-request_recommended_price(message2)
+#request_recommended_price(message2)
