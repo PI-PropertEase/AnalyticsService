@@ -20,10 +20,8 @@ def is_bad_trend(location):
     topics = rising_topics + top_topics
     df = pd.DataFrame(topics, columns=['topics'])
 
-    print(df)
-
-    strings_to_check = ['disaster', 'tragedy', 'flood', 'murder', 'death', 'dead', 'violence', 'invasion'
-                    r'fire(?!works)', 'storm', 'hurricane', 'cyclone', 'tornado', 'earthquake', 'conflict'
+    strings_to_check = ['disaster', 'tragedy', 'flood', 'murder', 'death', 'dead', 'violence', 'invasion',
+                    r'fire(?!works)', 'storm', 'hurricane', 'cyclone', 'tornado', 'earthquake', 'conflict',
                     'shooting', 'terrorism', 'bomb', 'kill', 'kidnapping', 'genocide', 'war']
     
     if df['topics'].str.contains('|'.join(strings_to_check), case=False).any():
@@ -48,17 +46,11 @@ def calculate_price_by_trends(location, prices_by_location_df, recommended_price
 
     results = search.as_dict()
     interest_over_time = results["interest_over_time"]["timeline_data"]
-    print(interest_over_time)
     data = [{'value': value_entry['extracted_value']} for entry in interest_over_time for value_entry in entry['values']]
     df_trends_yesterday_today = pd.DataFrame(data).tail(2)
-
-    print(df_trends_yesterday_today)
     
     df_pct_changes = df_trends_yesterday_today.pct_change()
     trend_pct_change = df_pct_changes.iloc[-1]['value']
-
-    print("\nTrend pct change:")
-    print(trend_pct_change)
 
     if trend_pct_change > 0.1:
         price_change = math.log10( (trend_pct_change + 0.3) / 4 ) + 1
@@ -66,9 +58,6 @@ def calculate_price_by_trends(location, prices_by_location_df, recommended_price
         price_change = -1 * math.log10( ((-1*trend_pct_change) + 0.3) / 4 ) - 1
     else:
         price_change = 0
-
-    print("\nPrice change:")
-    print(price_change)
 
     recommended_prices = {}
 
