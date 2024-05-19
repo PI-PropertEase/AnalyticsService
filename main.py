@@ -30,12 +30,8 @@ def calcualte_recommended_price(properties_list):
     X = pd.DataFrame(properties_list).drop(["price","location"], axis = 1)
 
     recommended_price_by_model = calcualte_recommended_price_by_model(X)
-    print(recommended_price_by_model)
-
     recommended_prices_real_price = calculate_real_price_difference(real_prices_df)
-
     recommended_prices_trends = recommend_prices_by_trends(real_prices_df, recommended_price_by_model)
-    print(recommended_prices_trends)
 
     recommended_prices = {}
 
