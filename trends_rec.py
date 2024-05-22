@@ -16,7 +16,7 @@ def is_bad_trend(location):
 
     results = search.as_dict()
     topics = []
-    
+
     if "rising" in results["related_topics"]:
         topics = [f"{topic['topic']['title']} {topic['topic']['type']}" for topic in results["related_topics"]["rising"]]
     if "top" in results["related_topics"]:    
@@ -28,8 +28,8 @@ def is_bad_trend(location):
     df = pd.DataFrame(topics, columns=['topics'])
 
     strings_to_check = ['disaster', 'tragedy', r'flood(?!plain)', 'murder', 'invasion', 'homicide', 'assassination',
-                    r'fire(?!works|cracker|proof|fighter|baller|place|board|brick|break|guard|stone|house|wall|\sstation)',
-                    'storm', 'hurricane', 'cyclone', 'tornado', 'earthquake', 
+                    r'fire(?!work|cracker|proof|fighter|baller|place|board|brick|break|guard|stone|house|wall|\sstation)',
+                    'storm', 'hurricane', 'cyclone', 'tornado', 'earthquake', 'weapon', 'missile',
                     'shooting', 'terrorism', r'bomb(?!astic)', r'^killing', 'kidnapping', 'genocide', r'^war$']
     
     if df['topics'].str.contains('|'.join(strings_to_check), case=False).any():
