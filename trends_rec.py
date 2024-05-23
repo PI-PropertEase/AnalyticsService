@@ -15,6 +15,10 @@ def is_bad_trend(location):
     })
 
     results = search.as_dict()
+
+    if "related_topics" not in results:
+        return False
+    
     topics = []
 
     if "rising" in results["related_topics"]:
@@ -53,6 +57,10 @@ def calculate_price_by_trends(location, prices_by_location_df, recommended_price
     })
 
     results = search.as_dict()
+    
+    if "interest_over_time" not in results:
+        return prices_by_location_df.set_index('id')['price'].to_dict()
+    
     interest_over_time = results["interest_over_time"]["timeline_data"]
     data = [{'value': value_entry['extracted_value']} for entry in interest_over_time for value_entry in entry['values']]
     df_trends_yesterday_today = pd.DataFrame(data).tail(2)
