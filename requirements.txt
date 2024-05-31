@@ -1,8 +1,11 @@
 aio-pika==9.4.1
 aiormq==6.8.0
 annotated-types==0.6.0
+certifi==2024.2.2
+charset-normalizer==3.3.2
 idna==3.7
 joblib==1.4.0
+lxml==5.2.2
 multidict==6.0.5
 numpy==1.26.4
 pamqp==3.3.0
@@ -12,11 +15,14 @@ pydantic==2.7.1
 pydantic_core==2.18.2
 python-dateutil==2.9.0.post0
 pytz==2024.1
+requests==2.31.0
 schedule==1.2.1
 scikit-learn==1.4.2
 scipy==1.13.0
+serpapi==0.1.5
 six==1.16.0
 threadpoolctl==3.4.0
 typing_extensions==4.11.0
 tzdata==2024.1
+urllib3==2.2.1
 yarl==1.9.4

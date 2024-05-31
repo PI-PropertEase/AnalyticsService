@@ -1,4 +1,5 @@
 # AnalyticsService
+
 Service responsible for applying the price recommendation algorithm.
 
 If you don't have git-lfs installed, install it before pulling/cloning this repository.
@@ -15,3 +16,7 @@ For more info, refer to [Git-LFS website](https://git-lfs.com/)
 
 `git lfs install`
 
+# Accessing the Elasticsearch Interface
+
+After running `docker-compose up --build` in the control room, access the interface via the following link:
+`http://0.0.0.0:5601`
