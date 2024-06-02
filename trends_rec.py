@@ -69,10 +69,12 @@ def calculate_price_by_trends(location, prices_by_location_df, recommended_price
     df_pct_changes = df_trends_yesterday_today.pct_change()
     trend_pct_change = df_pct_changes.iloc[-1]['value']
 
+    trend_pct_change = max(min(trend_pct_change, 1.0), -1.0)
+
     if trend_pct_change > 0.1:
         price_change = math.log10( (trend_pct_change + 0.3) / 4 ) + 1
     elif trend_pct_change < -0.1:
-        price_change = -1 * math.log10( ((-1*trend_pct_change) + 0.3) / 4 ) - 1
+        price_change = -math.log10( ((-trend_pct_change) + 0.3) / 4 ) - 1
     else:
         price_change = 0
 
@@ -81,7 +83,7 @@ def calculate_price_by_trends(location, prices_by_location_df, recommended_price
     for _, property in prices_by_location_df.iterrows():
         new_price = property["price"] * (1 + price_change)
         if new_price >= recommended_prices_by_model[property["id"]]:
-            recommended_prices[property["id"]] = property["price"] * (1 + price_change)
+            recommended_prices[property["id"]] = new_price
         else:
             recommended_prices[property["id"]] = property["price"]
 
