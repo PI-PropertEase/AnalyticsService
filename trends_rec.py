@@ -64,6 +64,7 @@ def calculate_price_by_trends(location, prices_by_location_df, recommended_price
     interest_over_time = results["interest_over_time"]["timeline_data"]
     data = [{'value': value_entry['extracted_value']} for entry in interest_over_time for value_entry in entry['values']]
     df_trends_yesterday_today = pd.DataFrame(data).tail(2)
+    df_trends_yesterday_today.replace(0, 1, inplace=True)  # Avoid division by zero leading to inf values
     
     df_pct_changes = df_trends_yesterday_today.pct_change()
     trend_pct_change = df_pct_changes.iloc[-1]['value']
